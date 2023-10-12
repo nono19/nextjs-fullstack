@@ -13,11 +13,6 @@ import { z } from "zod";
 import ErrorMessage from '@/app/components/ErrorMessage';
 import Spinner from '@/app/components/Spinner';
 
-// interface IssueForm {
-//   title: string
-//   description: string
-// }
-
 type IssueForm = z.infer<typeof createIssuesSchema>
 
 const NewIssuePage = () => {
@@ -27,6 +22,17 @@ const NewIssuePage = () => {
   })
   const [error, setError] = useState('')
   const [isSubmitting, setSubmitting] = useState(false)
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      setSubmitting(true)
+      await axios.post('/api/issues', data)
+      router.push('/issues')
+    } catch (error) {
+      setSubmitting(false)
+      setError('an unexpected error occured')
+    }
+  })
 
   return (
     <div className='max-w-xl '>
@@ -41,16 +47,7 @@ const NewIssuePage = () => {
       }
       <form 
         className='space-y-3' 
-        onSubmit={handleSubmit(async (data) => {
-          try {
-            setSubmitting(true)
-            await axios.post('/api/issues', data)
-            router.push('/issues')
-          } catch (error) {
-            setSubmitting(false)
-            setError('an unexpected error occured')
-          }
-        })}
+        onSubmit={ onSubmit }
         >
         <TextField.Root>
           <TextField.Input placeholder='Title' {...register('title')} />
